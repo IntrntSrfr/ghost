@@ -19,7 +19,7 @@ SET default_table_access_method = heap;
 
 CREATE TABLE public.account (
     id integer NOT NULL,
-    key_hash character varying(36) NOT NULL
+    key_hash character varying(64) NOT NULL
 );
 
 CREATE SEQUENCE public.account_id_seq
@@ -32,12 +32,12 @@ CREATE SEQUENCE public.account_id_seq
 
 ALTER SEQUENCE public.account_id_seq OWNED BY public.account.id;
 
-
 CREATE TABLE public.upload (
     id integer NOT NULL,
-    account_id integer NOT NULL,
+    hash text NOT NULL,
+    extension text NOT NULL,
     created timestamp with time zone NOT NULL,
-    filename text NOT NULL
+    account_id integer NOT NULL
 );
 
 CREATE SEQUENCE public.upload_id_seq

@@ -1,10 +1,17 @@
 package model
 
-import "time"
+import (
+	"time"
+)
 
 type Upload struct {
 	ID        int       `db:"id" json:"id"`
-	AccountID int       `db:"account_id" json:"account_id"`
+	Hash      string    `db:"hash" json:"hash"`
+	Extension string    `db:"extension" json:"extension"`
 	Created   time.Time `db:"created" json:"created"`
-	Filename  string    `db:"filename" json:"filename"`
+	AccountID int       `db:"account_id" json:"account_id"`
+}
+
+func (u Upload) String() string {
+	return u.Hash + u.Extension
 }
