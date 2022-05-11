@@ -1,0 +1,11 @@
+{
+  "Version": "1.0.0",
+  "Name": "Ghost",
+  "DestinationType": "FileUploader",
+  "RequestMethod": "POST",
+  "Headers": {
+    "Authorization": "[INSERT API KEY HERE]"
+  },
+  "Body": "MultipartFormData",
+  "FileFormName": "file"
+}
