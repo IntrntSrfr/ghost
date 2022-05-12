@@ -1,11 +1,13 @@
 {
-  "Version": "1.0.0",
+  "Version": "13.7.0",
   "Name": "Ghost",
   "DestinationType": "FileUploader",
   "RequestMethod": "POST",
+  "RequestURL": "[INSERT YOUR DOMAIN HERE]/upload",
   "Headers": {
     "Authorization": "[INSERT API KEY HERE]"
   },
   "Body": "MultipartFormData",
-  "FileFormName": "file"
+  "FileFormName": "file",
+  "URL": "[INSERT YOUR DOMAIN HERE]/$json:file$"
 }

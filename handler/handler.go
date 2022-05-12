@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/intrntsrfr/ghost/db"
@@ -22,7 +24,7 @@ func NewHandler(d db.DB, logger *zap.Logger) *Handler {
 	r := gin.Default()
 	h := &Handler{r, d, logger}
 
-	r.POST("/upload", h.upload())
+	r.POST("/upload", h.Auth(), h.upload())
 	r.GET("/:imageID", h.findFile())
 
 	return h
@@ -44,22 +46,25 @@ func (h *Handler) upload() gin.HandlerFunc {
 			hash = generate(10)
 		}
 
+		userID := c.MustGet("userID").(int)
+
 		u := &model.Upload{
 			Hash:      hash,
 			Extension: ext,
 			Created:   time.Now(),
-			AccountID: 1,
+			AccountID: userID,
 		}
 
 		s, err := h.d.CreateUpload(u)
 		if err != nil {
-			fmt.Println(err)
+			h.logger.Error("could not create upload entry", zap.Error(err))
 			c.JSON(http.StatusInternalServerError, gin.H{"message": "something happened"})
 			return
 		}
 
 		err = c.SaveUploadedFile(file, fmt.Sprintf("./_storage/%v%v", u.Hash, u.Extension))
 		if err != nil {
+			h.logger.Error("could not save upload file", zap.Error(err))
 			c.JSON(http.StatusInternalServerError, gin.H{"message": "something happened"})
 			return
 		}
@@ -89,14 +94,29 @@ func generate(n int) string {
 	return string(b)
 }
 
-func Auth() gin.HandlerFunc {
+func (h *Handler) Auth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		key := c.GetHeader("Authorization")
 		if key == "" {
 			c.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
 			c.Abort()
+			return
 		}
-		c.Set("auth", key)
+
+		hashed := hash(key)
+		a := h.d.GetUserByHash(hashed)
+		if a == nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
+			c.Abort()
+			return
+		}
+		c.Set("userID", a.ID)
 		c.Next()
 	}
+}
+
+func hash(pt string) string {
+	h := sha256.New()
+	h.Write([]byte(pt))
+	return hex.EncodeToString(h.Sum(nil))
 }

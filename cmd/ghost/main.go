@@ -17,8 +17,6 @@ func main() {
 
 	DbUser, DbPass := os.Getenv("POSTGRES_USER"), os.Getenv("POSTGRES_PASSWORD")
 
-	fmt.Println(DbUser, DbPass)
-
 	psql := sqlx.MustConnect("postgres", fmt.Sprintf("host=database user=%s password=%s dbname=%s sslmode=disable",
 		DbUser, DbPass, DbUser))
 
@@ -30,7 +28,7 @@ func main() {
 	d := db.NewPsqlDB(psql, logger.Named("database"))
 
 	if _, err := os.Stat("./_storage"); os.IsNotExist(err) {
-		err := os.Mkdir("./_storage", os.ModeDir)
+		err := os.Mkdir("./_storage", os.ModeDir|os.ModePerm)
 		if err != nil {
 			panic(err)
 		}
