@@ -84,7 +84,7 @@ func (h *Handler) findFile() gin.HandlerFunc {
 	}
 }
 
-var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+var letterRunes = []rune("abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 func generate(n int) string {
 	b := make([]rune, n)
