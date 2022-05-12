@@ -98,16 +98,14 @@ func (h *Handler) Auth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		key := c.GetHeader("Authorization")
 		if key == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
-			c.Abort()
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
 			return
 		}
 
-		hashed := hash(key)
+		hashed := sha256Hash(key)
 		a := h.d.GetUserByHash(hashed)
 		if a == nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
-			c.Abort()
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
 			return
 		}
 		c.Set("userID", a.ID)
@@ -115,7 +113,7 @@ func (h *Handler) Auth() gin.HandlerFunc {
 	}
 }
 
-func hash(pt string) string {
+func sha256Hash(pt string) string {
 	h := sha256.New()
 	h.Write([]byte(pt))
 	return hex.EncodeToString(h.Sum(nil))
